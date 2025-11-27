@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: harbor.devopsviet.io.vn/gemini-project/my-gemini-app
   pullPolicy: IfNotPresent
-  tag: "latest" # Jenkins sẽ override giá trị này khi deploy
+  tag: "" # Jenkins sẽ override giá trị này khi deploy
 
 service:
   type: NodePort
