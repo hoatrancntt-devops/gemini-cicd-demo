@@ -10,4 +10,4 @@ service:
   port: 5000
   targetPort: 5000
   nodePort: 30005 # Cố định port để dễ test (Optional)
-geminiApiKey: "AIzaSyBXLjmWDjUSKDk1lUxeug0wTnfsKDBczro"
+geminiApiKey: "AIzaSyB2h7Id4EsftN4EgMXDcEu3RKa2Y2kS7g0"
