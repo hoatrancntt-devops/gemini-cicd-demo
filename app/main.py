@@ -1,52 +1,77 @@
 import os
 from flask import Flask, request
-import google.generativeai as genai
+from google import genai
 
 app = Flask(__name__)
+
+# Lấy API Key từ biến môi trường
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
+# Khởi tạo Client (SDK Mới)
 if GOOGLE_API_KEY:
-    genai.configure(api_key=GOOGLE_API_KEY)
+    client = genai.Client(api_key=GOOGLE_API_KEY)
 else:
-    print("Warning: Missing API Key")
-
-def get_model():
-    # Thử lần lượt các model có trong danh sách hỗ trợ của bạn
-    candidates = [
-        'gemini-2.0-flash', 
-        'gemini-2.5-flash', 
-        'gemini-1.5-flash'
-    ]
-    for model_name in candidates:
-        try:
-            return genai.GenerativeModel(model_name)
-        except:
-            continue
-    return genai.GenerativeModel('gemini-2.0-flash')
-
-model = get_model()
+    client = None
 
 @app.route('/')
 def home():
-    if not GOOGLE_API_KEY: return "Lỗi: Thiếu API Key!"
+    if not client:
+        return "Lỗi: Chưa cấu hình GOOGLE_API_KEY trong Kubernetes!"
     
-    query = request.args.get('q', 'Cấu hình OSPF area 0 cho interface Gi0/0 IP 10.0.0.1/30')
+    query = request.args.get('q', 'Xin chào Gemini')
     
     try:
-        # Prompt đóng vai kỹ sư mạng
-        prompt = f"Bạn là kỹ sư mạng Cisco. Viết lệnh CLI cho yêu cầu: '{query}'. Chỉ hiện lệnh."
-        response = model.generate_content(prompt)
+        # Gọi Gemini 2.5 Flash
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", 
+            contents=query
+        )
         
+        # Giao diện Chatbot đẹp mắt
         return f"""
-        body{{background:#1e1e1e;color:#d4d4d4;font-family:monospace;padding:20px}} 
-               pre{{background:black;padding:15px;border-left:4px solid #0ea5e9;color:#00ff00}}
-        🤖 AI Network Config Generator
-        Generate
-        Command Output:
-        {response.text}
+        
+        
+        
+            
+            Gemini AI Chat
+            
+                body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; }}
+                .chat-container {{ background: white; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 90vh; }}
+                .header {{ background: #0ea5e9; color: white; padding: 20px; text-align: center; }}
+                .header h1 {{ margin: 0; font-size: 1.5rem; }}
+                .content {{ flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }}
+                .message {{ padding: 15px; border-radius: 8px; max-width: 80%; line-height: 1.5; }}
+                .user-msg {{ background: #e0f2fe; align-self: flex-end; border-bottom-right-radius: 0; }}
+                .ai-msg {{ background: #f3f4f6; align-self: flex-start; border-bottom-left-radius: 0; }}
+                .input-area {{ border-top: 1px solid #eee; padding: 20px; background: white; }}
+                form {{ display: flex; gap: 10px; }}
+                input {{ flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; }}
+                input:focus {{ border-color: #0ea5e9; }}
+                button {{ padding: 12px 24px; background: #0ea5e9; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }}
+                button:hover {{ background: #0284c7; }}
+            
+        
+        
+            
+                
+                    🤖 Trợ Lý AI Gemini 2.5
+                
+                
+                    Bạn: {query}
+                    Gemini: {response.text}
+                
+                
+                    
+                        
+                        Gửi
+                    
+                
+            
+        
+        
         """
     except Exception as e:
-        return f"Lỗi API: {str(e)}"
+        return f"Lỗi gọi API: {str(e)}"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

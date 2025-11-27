@@ -19,7 +19,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           env:
             - name: GOOGLE_API_KEY
-              value: {{ .Values.geminiApiKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-secret
+                  key: api-key
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
