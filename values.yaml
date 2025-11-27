@@ -1,0 +1,4 @@
+image:
+  repository: harbor.devopsviet.io.vn/gemini-project/my-app
+service:
+  type: NodePort
