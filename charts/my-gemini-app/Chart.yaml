@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: harbor.devopsviet.io.vn/gemini-project/my-gemini-app
+  pullPolicy: IfNotPresent
+  tag: "latest" # Jenkins sẽ override giá trị này khi deploy
+
+service:
+  type: NodePort
+  port: 5000
+  targetPort: 5000
+  nodePort: 30005 # Cố định port để dễ test (Optional)
